@@ -7,8 +7,9 @@
 void aloca(float **p, int tam);
 
 //Trapézios
-float definirValoresX(float *x, float h, float maximo, float minimo, int nroDivisoes);
-float calculaH (float minimo, float maximo, float h, int nroDivisoes);
+void definirValoresX(float *x, float h, float maximo, float minimo, int nroDivisoes);
+void valoresx(float *x, float h, float maximo, float minimo, int nroDivisoes);
+float calculaH (float minimo, float maximo, int nroDivisoes);
 float calculaIt (float h, float minimo, float maximo );
 
 int main(){
@@ -22,8 +23,6 @@ int main(){
 	float *coeficiente = NULL;
 	float minimo=0, maximo=0, h=0;
 	float *valoresFx = NULL, *valoresX = NULL;
-
-	definirValoresX(valoresX, 0.2, 4,2,10);
 
 	do{
 	system("cls");
@@ -47,11 +46,11 @@ int main(){
 				} while(grau<1 || grau>10);
 
 				printf("\n\nDigite o intervalo");
-				printf("\nValor Minimo: ");
+				printf("\n\nValor Minimo: ");
 				scanf("%f", &minimo);
 				fflush(stdin);
 
-				printf("\nValor Maximo: ");
+				printf("Valor Maximo: ");
 				scanf("%f", &maximo);
 				fflush(stdin);
 
@@ -65,7 +64,11 @@ int main(){
                         scanf("%f", coeficiente+i);
                         fflush(stdin);  
                     }
-                    
+				h=calculaH(minimo, maximo, nroDivisoes);
+				printf("\nH = %.2f\n", h);
+				valoresx(valoresX, h, maximo, minimo, nroDivisoes);
+				
+				system("pause");
 				break;
 		
 		
@@ -92,8 +95,9 @@ void aloca(float **p, int tam)
 
 
 //Trapézios	
-float calculaH (float minimo, float maximo, float h, int nroDivisoes)
+float calculaH (float minimo, float maximo, int nroDivisoes)
 {
+	float h;
 	h = (maximo - minimo)/nroDivisoes;
 	return h;
 }
@@ -103,14 +107,33 @@ float calculaH (float minimo, float maximo, float h, int nroDivisoes)
 	float it = (h/2)*()	
 }*/
 //		lista de valores de x, o passo entre as divisões, e o valor, int nroDivisoes máximo e mínimo
-float definirValoresX(float* x, float h, float maximo, float minimo, int nroDivisoes){
+void valoresx(float *x, float h, float maximo, float minimo, int nroDivisoes){
+int i;
+int total=nroDivisoes-1; //tirar maximo
+	printf("\nX[%i] = %.2f", 0, minimo);
+	for(i=0; i<total; i++){
+		aloca(&x, i+1);
+		*(x+i)=(minimo+(h*(i+1)));
+		printf("\nX[%i] = %.2f", i+1, *(x+i));
+	}
+	printf("\nX[%i] = %.2f\n\n", nroDivisoes, maximo);
+}//valoresx
+
+
+/*
+void definirValoresX(float *x, float h, float maximo, float minimo, int nroDivisoes){
 	int i;
 	for(i = 0; i< nroDivisoes-1; i++){ 
 		aloca(&x, i+1);
-		*(x+i) = minimo + (h*i);
-	}
-	}
+		*(x+i)=h;
+		//+ (h*(i+1));
 
+		printf("\nX[%i] = %.2f", i, (x+i));
+	}
+}*/
+
+
+/*
 float calculaFx ()
 {
 	printf("alo");
@@ -119,4 +142,4 @@ float calculaFx ()
 float calculaPolinomioIntervalo()
 {
 	printf("alo");
-}
+}*/
