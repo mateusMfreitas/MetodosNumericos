@@ -28,7 +28,7 @@ int main(){
 	do{
 	system("cls");
 	printf("----------------------MENU-------------------\n\n");
-	printf("[1]Regra dos Trapézios\n[2]Métodos dos Mínimos Quadrados\n[3]Saída\n\n");
+	printf("[1]Regra dos Trapezios\n[2]Metodos dos Minimos Quadrados\n[3]Saida\n\n");
 	scanf("%i", &menu);
     fflush(stdin);
 	
@@ -36,23 +36,27 @@ int main(){
 		
 		//Regra dos Trapézios 
 		case 1: system("cls");
-				printf("---------------- Metodos Numericos Computacionais - Regra dos Trapézios ----------------");
+				printf("---------------- Metodos Numericos Computacionais - Regra dos Trapezios ----------------");
 				
-				printf("\n\nDigite o intervalo \n");
-				printf("\n\nValor Minimo: \n");
+				do{
+					printf("\n\nDigite o grau da equacao: ");
+					scanf("%i", &grau);
+					fflush(stdin);
+					if(grau<1 || grau>10)
+						printf("Numero fora do intervalo (1 a 10), digite novamente\n");
+				} while(grau<1 || grau>10);
+
+				printf("\n\nDigite o intervalo");
+				printf("\nValor Minimo: ");
 				scanf("%f", &minimo);
 				fflush(stdin);
 
-				printf("\n\nValor Maximo: \n");
+				printf("\nValor Maximo: ");
 				scanf("%f", &maximo);
 				fflush(stdin);
 
-				printf("\n\nDigite o numero de divisoes: \n");
+				printf("\n\nDigite o numero de divisoes: ");
 				scanf("%i", &nroDivisoes);
-				fflush(stdin);
-				
-				printf("\n\nDigite o grau da equacao: \n");
-				scanf("%i", &grau);
 				fflush(stdin);
                    
                     for(i=0; i<=grau; i++){
