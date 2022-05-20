@@ -7,9 +7,9 @@
 void aloca(float **p, int tam);
 
 //Trapézios
-float definirValoresX(float *x, float h, float maximo, float minimo, int nroDivisoes)
+float definirValoresX(float *x, float h, float maximo, float minimo, int nroDivisoes);
 float calculaH (float minimo, float maximo, float h, int nroDivisoes);
-float calculaIt (float h, float minimo, float maximo );;
+float calculaIt (float h, float minimo, float maximo );
 
 int main(){
 	
@@ -28,7 +28,7 @@ int main(){
 	do{
 	system("cls");
 	printf("----------------------MENU-------------------\n\n");
-	printf("[1]Regra dos Trapézios\n[2]Métodos dos Mínimos Quadrados\n[3]Sa�da\n\n");
+	printf("[1]Regra dos Trapézios\n[2]Métodos dos Mínimos Quadrados\n[3]Saída\n\n");
 	scanf("%i", &menu);
     fflush(stdin);
 	
@@ -80,17 +80,17 @@ int main(){
 
 void aloca(float **p, int tam)
 {
-	if( (*p=(float *)realloc(*p,tam*sizeof(float)) )==NULL)
-	printf("Erro!");
-	exit(1);
-
+	if( (*p=(float *)realloc(*p,tam*sizeof(float)) )==NULL){
+		printf("Erro!");
+		exit(1);
+	}
 }//aloca
 
 
 //Trapézios	
 float calculaH (float minimo, float maximo, float h, int nroDivisoes)
 {
-	float h = (maximo - minimo)/nroDivisoes;
+	h = (maximo - minimo)/nroDivisoes;
 	return h;
 }
 
@@ -100,7 +100,8 @@ float calculaH (float minimo, float maximo, float h, int nroDivisoes)
 }*/
 //		lista de valores de x, o passo entre as divisões, e o valor, int nroDivisoes máximo e mínimo
 float definirValoresX(float* x, float h, float maximo, float minimo, int nroDivisoes){
-	for(int i = 0; i< nroDivisoes-1; i++){ 
+	int i;
+	for(i = 0; i< nroDivisoes-1; i++){ 
 		aloca(&x, i+1);
 		*(x+i) = minimo + (h*i);
 	}
