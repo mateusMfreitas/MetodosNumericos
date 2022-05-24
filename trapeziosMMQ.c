@@ -13,7 +13,8 @@ void valoresx(float *fx, float h, float maximo, float minimo, int nroDivisoes, i
 void valoresfx(float *x, float *fx, float *coef, float maximo, float minimo, int grau, int nroDivisoes);
 float calculaIt(float h, float minimo, float maximo);
 
-
+float descobriU(float *x, float *y, float *mu,int qtde, int grau);
+float produtoEscalar(float *x, float *y, float *mu,int qtde, int grau);
 
 int main()
 {
@@ -26,6 +27,9 @@ int main()
 	float *coeficiente = NULL;
 	float minimo = 0, maximo = 0, h = 0;
 	float *valoresFx = NULL, *valoresX = NULL;
+
+	float *xMMQ=NULL, *yMMQ=NULL, *matrizU=NULL; 
+	int qtde, j;
 
 	do
 	{
@@ -85,6 +89,32 @@ int main()
 		// Método dos Mínimos Quadrados
 		case 2: // system("cls");
 			printf("---------------- Metodos Numericos Computacionais - Mínimos Quadrados ----------------");
+
+			do
+			{
+				printf("\n\nDigite o grau da equacao: ");
+				scanf("%i", &grau);
+				fflush(stdin);
+				if (grau < 1 || grau > 10)
+					printf("Numero fora do intervalo (1 a 10), digite novamente\n");
+			} while (grau < 1 || grau > 10);
+
+			printf("\nQuantos valores a matriz vai ter? ");
+			scanf("%i", &qtde);
+
+			printf("\nDigite valores de x:\n");
+			for(i=0; i<qtde; i++){
+					aloca(&xMMQ, i+1);
+					scanf("%f", (xMMQ+i));
+			}
+			printf("\nDigite valores de y:\n");
+			for(i=0; i<qtde; i++){
+					aloca(&yMMQ, i+1);
+					scanf("%f", (yMMQ+i));
+			}
+		//	descobriU(xMMQ, yMMQ, matrizU, qtde, grau);
+
+
 
 			break;
 
@@ -191,3 +221,34 @@ float calculaPolinomioIntervalo()
 {
 	printf("alo");
 }*/
+
+/*
+float descobriU(float *x, float *y, float *mu,int qtde, int grau){
+	int l, c;
+	
+	for(l=0;l<=qtde;l++)
+	{
+		aloca(&mu, l+1);
+	    for(c=0;c<=grau;c++)
+	    {
+			*(mu+l*grau+c) = pow((x+l), grau);	// endereço de cada elemento
+	    }
+	}
+}
+
+float produtoEscalar(float *x, float *y, float *mu, float *m,int qtde, int grau){
+	int l, c;
+	
+	for(l=0;l<=qtde;l++)
+	{
+		aloca(&m, l+1);
+	    for(c=0;c<=qtde;c++)
+	    {
+			(*(m+l*coluna+c))*(*(m+l*coluna+c))			
+			
+	    }
+	}
+}
+
+*(m+l*coluna+c)=()
+*/
