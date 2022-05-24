@@ -9,9 +9,9 @@ void aloca(float **p, int tam);
 // Trapézios
 
 float calculaH(float minimo, float maximo, int nroDivisoes);
-void valoresx(float *fx, float h, float maximo, float minimo, int nroDivisoes, int grau, float *coef);
-void valoresfx(float *x, float *fx, float *coef, float maximo, float minimo, int grau, int nroDivisoes);
-float calculaIt(float h, float minimo, float maximo);
+void valoresx(float *fx, float h, float maximo, float minimo, int nroDivisoes, int grau, float *coef, float *x);
+//void valoresfx(float *x, float *fx, float *coef, float maximo, float minimo, int grau, int nroDivisoes);
+void calculaIt(float *fx, float h, int nroDivisoes);
 
 float descobriU(float *x, float *y, float *mu,int qtde, int grau);
 float produtoEscalar(float *x, float *y, float *mu,int qtde, int grau);
@@ -23,7 +23,7 @@ int main()
 
 	int i, tam, menu, grau;
 	// Trapézios
-	int nroDivisoes;
+	int nroDivisoes, op;
 	float *coeficiente = NULL;
 	float minimo = 0, maximo = 0, h = 0;
 	float *valoresFx = NULL, *valoresX = NULL;
@@ -65,10 +65,6 @@ int main()
 			scanf("%f", &maximo);
 			fflush(stdin);
 
-			printf("\n\nDigite o numero de divisoes: ");
-			scanf("%i", &nroDivisoes);
-			fflush(stdin);
-
 			for (i = 0; i <= grau; i++)
 			{
 				aloca(&coeficiente, i + 1);
@@ -77,13 +73,22 @@ int main()
 				fflush(stdin);
 			}
 
-			h = calculaH(minimo, maximo, nroDivisoes);
-			printf("\nH = %.2f\n", h);
-			valoresx(valoresX, h, maximo, minimo, nroDivisoes, grau, coeficiente);
-			printf("\nTESTEEE\n");
-			// valoresfx(valoresX, valoresFx, coeficiente, maximo, minimo, grau, nroDivisoes);
+			do{
 
-			system("pause");
+				printf("\n\nDigite o numero de divisoes: ");
+				scanf("%i", &nroDivisoes);
+				fflush(stdin);
+
+				h = calculaH(minimo, maximo, nroDivisoes);
+				printf("\nH = %.2f\n", h);
+				valoresx(valoresFx, h, maximo, minimo, nroDivisoes, grau, coeficiente, valoresX);  //calcula x fx e it
+				printf("\n\n");
+				system("pause");
+				printf("\nDeseja calcular novamente com outro numero de trapezios? 1(sim) ou 2(nao)");
+				scanf("%i", &op);
+			}while(op==1);
+
+		
 			break;
 
 		// Método dos Mínimos Quadrados
@@ -142,85 +147,71 @@ float calculaH(float minimo, float maximo, int nroDivisoes)
 	return h;
 }
 
-/*float calculaIt (flcalcula oat h, float minimo, float maximo )
-{
-	float it = (h/2)*()
-}*/
-//		lista de valores de x, o passo entre as divisões, e o valor, int nroDivisoes máximo e mínimo
 
-void valoresx(float *fx, float h, float maximo, float minimo, int nroDivisoes, int grau, float *coef)
+void valoresx(float *fx, float h, float maximo, float minimo, int nroDivisoes, int grau, float *coef, float *x)
 {
 	int i, j;
 	int total = nroDivisoes; // tirar maximo
 	float valorF = 0;
-	float x;
-	// printf("\nX[%i] = %.2f", 0, minimo);
-	for (i = 0; i < total; i++)
+	
+	for (i = 0; i <= total; i++)
 	{
 		aloca(&fx, i + 1);
-		x = 0;
+		aloca(&x, i + 1);
 		valorF = 0;
-		x = (minimo + (h * (i + 1)));
+		if(i!=0 && i!=nroDivisoes)
+			*(x+i) = (minimo + (h * (i)));   //calcula x
+
 		for (j = 0; j <= grau; j++)
 		{
 			if (i == 0)
-				valorF = (*(coef + j)) * (pow(minimo, j));
+				valorF += (*(coef + j)) * (pow(minimo, j));
 			else if (i == nroDivisoes)
 				valorF += (*(coef + j)) * (pow(maximo, j));
 			else
-				valorF += (*(coef + j)) * (pow(x, j));
+				valorF += (*(coef + j)) * (pow((*(x+i)), j));
 		}
-		printf("\nFx[%i] = %.2f", i + 1, *(fx + i));
+		*(fx+i)=valorF;
+		
 	}
-	// printf("\nX[%i] = %.2f\n\n", nroDivisoes, maximo);
+
+	//mostrar valores de X e Fx
+	for(i=0; i<=nroDivisoes; i++){
+		if(i==0)
+			printf("\nX[%i] = %.2f", i, minimo);
+		else if(i==nroDivisoes)
+			printf("\nX[%i] = %.2f", i, maximo);
+		else
+			printf("\nX[%i] = %.2f", i, *(x+i));
+	}
+	printf("\n");
+	for(i=0; i<=nroDivisoes; i++)
+		printf("\nFx[%i] = %.2f", i, *(fx+i));
+	printf("\n");
+
+	calculaIt(fx, h, nroDivisoes);
+
 } // valoresx
-  /*
-  void valoresfx(float *x, float *fx, float *coef, float maximo, float minimo, int grau, int nroDivisoes)
-  {
-	  int i, j;
-	  float valorF = 0, teste = 2;
+
+void calculaIt(float *fx, float h, int nroDivisoes){
+	int i;
+	float soma=0, calculo=0, maximo, minimo;
+	for(i=0; i<=nroDivisoes; i++){
+		if(i==0)
+			minimo=*(fx+i);
+		else if(i==nroDivisoes)
+			maximo=*(fx+i);
+		else
+			soma+=*(fx+i);
+	}
+	calculo=(h/2)*((minimo + maximo)+(2*soma));  //calculo da integral
+	printf("\n%ITR = %.4f\n", calculo);
+
+}///calculaIt
+
+
+
   
-	  for (i = 0; i < nroDivisoes; i++)
-	  { // i relaciona com x
-		  valorF = 0;
-		  for (j = 0; j <= grau; j++) // j relaciona com o polinomio
-		  {
-			  if (i == 0)
-				  valorF = ( *(coef + j)) * (pow(minimo, j));
-			  else if (i == nroDivisoes)
-				  valorF += (*(coef + j)) * (pow(minimo, j));
-			   else
-				  valorF+=(*(coef+j))*(pow(*(x+i),j));
-			  printf("\nvalor F = %.2f", &valorF);
-		  } // j
-		  aloca(&fx, i + 1);
-		  *(fx + i) = valorF;
-		  printf("\n valor de f: %f", *(fx + i));
-		  // printf("\nF(%.2f)= %.2f", *(fx), *(fx + i));
-	  } // i
-  } // valoresfx
-  */
-  /*
-  void calculaFx(float *fx, float *x, int grau){
-	  int i;
-	  float valorF = 0;
-	  for(i=0; i<=grau; i++){
-		  valorF +=(*(coef+i))*(pow(*(x+i),i));
-	  }
-	  return valorFa;
-  }
-  */
-
-/*
-float calculaFx ()
-{
-	printf("alo");
-}
-
-float calculaPolinomioIntervalo()
-{
-	printf("alo");
-}*/
 
 /*
 float descobriU(float *x, float *y, float *mu,int qtde, int grau){
