@@ -13,8 +13,10 @@ void valoresx(float *fx, float h, float maximo, float minimo, int nroDivisoes, i
 //void valoresfx(float *x, float *fx, float *coef, float maximo, float minimo, int grau, int nroDivisoes);
 void calculaIt(float *fx, float h, int nroDivisoes);
 
-float descobriU(float *x, float *y, float *mu,int qtde, int grau);
-float produtoEscalar(float *x, float *y, float *mu,int qtde, int grau);
+//MMQ
+void vetores(float *fx, float *x, float *u0, float *u1, float *u2, int qtde, int grau);
+//void descobriU(float *x, float *y, float *mu,int qtde, int grau);
+//void produtoEscalar(float *x, float *y, float *mu,int qtde, int grau);
 
 int main()
 {
@@ -30,6 +32,9 @@ int main()
 
 	float *xMMQ=NULL, *yMMQ=NULL, *matrizU=NULL; 
 	int qtde, j;
+
+	int operador;
+	float *u0=NULL, *u1 = NULL, *u2 = NULL;
 
 	do
 	{
@@ -92,19 +97,10 @@ int main()
 			break;
 
 		// Método dos Mínimos Quadrados
-		case 2: // system("cls");
+		case 2: system("cls");
 			printf("---------------- Metodos Numericos Computacionais - Mínimos Quadrados ----------------");
 
-			do
-			{
-				printf("\n\nDigite o grau da equacao: ");
-				scanf("%i", &grau);
-				fflush(stdin);
-				if (grau < 1 || grau > 10)
-					printf("Numero fora do intervalo (1 a 10), digite novamente\n");
-			} while (grau < 1 || grau > 10);
-
-			printf("\nQuantos valores a matriz vai ter? ");
+			printf("\n\nQuantos valores de x e y possui? ");
 			scanf("%i", &qtde);
 
 			printf("\nDigite valores de x:\n");
@@ -112,12 +108,21 @@ int main()
 					aloca(&xMMQ, i+1);
 					scanf("%f", (xMMQ+i));
 			}
+			
 			printf("\nDigite valores de y:\n");
 			for(i=0; i<qtde; i++){
 					aloca(&yMMQ, i+1);
 					scanf("%f", (yMMQ+i));
 			}
-		//	descobriU(xMMQ, yMMQ, matrizU, qtde, grau);
+
+			do{
+				printf("\nDigite uma opcao: 1 - reta ou 2 - parabola: ");
+				scanf("%i", &operador);
+				fflush(stdin);
+			}while(operador!=1 && operador!=2);
+
+		//vetores(yMMQ, xMMQ, u0, u1, u2, qtde, operador);
+	
 
 
 
@@ -209,9 +214,51 @@ void calculaIt(float *fx, float h, int nroDivisoes){
 
 }///calculaIt
 
+/*
+void vetores(float *fx, float *x, float *u0, float *u1, float *u2, int qtde, int grau){
+	
+	int i, j;
+	if(grau<=2){  
+		for(i=0; i<=qtde; i++){  //qtde de x 
+			aloca(&u0, i+1);
+				*(u0+j)=pow(*(x+i), 0);
+			aloca(&u1, i+1);
+				*(u0+j)=pow(*(x+i), 1);
+			if(grau==2){
+				aloca(&u2, i+1);
+				*(u2+j)=pow(*(x+i), 2);
+			}
+		}
+	}
+	/*else if(grau==2){  
+		for(i=0; i<=qtde; i++){  //qtde de x 
+			aloca(&u0, i+1);
+				*(u0+j)=pow(*(x+i), 0);
+			aloca(&u1, i+1);
+				*(u1+j)=pow(*(x+i), 1);
+			aloca(&u2, i+1);
+				*(u2+j)=pow(*(x+i), 2);
+		}
 
+	
+	//mostrar vetores
+	if(grau==1){
+		printf("\n  Y  \t  U0  \t  U1  \t");
+		for(i=0; i<=qtde; i++){
+			printf("\n%.2f\t%.2f\t%.2f\t", *(fx+i), *(u0+i), *(u1+i));
+		}
+	}
+	if(grau==2){
+		printf("\n  Y  \t  U0  \t  U1  \t  U2  \t");
+		for(i=0; i<=qtde; i++){
+			printf("\n%.2f\t%.2f\t%.2f\t%.2f\t", *(fx+i), *(u0+i), *(u1+i), *(u2+i));
+		}
+	}
+	
+			
+}
 
-  
+  */
 
 /*
 float descobriU(float *x, float *y, float *mu,int qtde, int grau){
