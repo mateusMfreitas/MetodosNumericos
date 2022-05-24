@@ -10,13 +10,20 @@ void aloca(float **p, int tam);
 
 float calculaH(float minimo, float maximo, int nroDivisoes);
 void valoresx(float *fx, float h, float maximo, float minimo, int nroDivisoes, int grau, float *coef, float *x);
-//void valoresfx(float *x, float *fx, float *coef, float maximo, float minimo, int grau, int nroDivisoes);
+// void valoresfx(float *x, float *fx, float *coef, float maximo, float minimo, int grau, int nroDivisoes);
 void calculaIt(float *fx, float h, int nroDivisoes);
 
-//MMQ
+// MMQ
 void vetores(float *fx, float *x, float *u0, float *u1, float *u2, int qtde, int grau);
-//void descobriU(float *x, float *y, float *mu,int qtde, int grau);
-//void produtoEscalar(float *x, float *y, float *mu,int qtde, int grau);
+// void descobriU(float *x, float *y, float *mu,int qtde, int grau);
+// void produtoEscalar(float *x, float *y, float *mu,int qtde, int grau);
+void mostra_sistemaLinear(float *sistemaLinear, int tipo);
+// MMQ Linear
+void mmq(float *sistemaLinear);
+void cria_sistemaLinear(float *sistemaLinear, float *x, float *y, int elementos);
+// MMQ quadrÃ¡tico
+void mmq_q(float *sistemaLinear);
+void cria_sistemaLinear_q(float *sistemaLinear, float *x, float *y, int elementos);
 
 int main()
 {
@@ -30,11 +37,15 @@ int main()
 	float minimo = 0, maximo = 0, h = 0;
 	float *valoresFx = NULL, *valoresX = NULL;
 
-	float *xMMQ=NULL, *yMMQ=NULL, *matrizU=NULL; 
+	// MMQ
+	float *xMMQ = NULL, *yMMQ = NULL;
 	int qtde, j;
 
 	int operador;
-	float *u0=NULL, *u1 = NULL, *u2 = NULL;
+	float *u0 = NULL, *u1 = NULL, *u2 = NULL;
+
+	float *sistemaLinearL = NULL, *sistemaLinearQ = NULL;
+	float sistemaLinear_l[6] = {0}, sistemaLinear_q[12] = {0};
 
 	do
 	{
@@ -78,7 +89,8 @@ int main()
 				fflush(stdin);
 			}
 
-			do{
+			do
+			{
 
 				printf("\n\nDigite o numero de divisoes: ");
 				scanf("%i", &nroDivisoes);
@@ -86,46 +98,60 @@ int main()
 
 				h = calculaH(minimo, maximo, nroDivisoes);
 				printf("\nH = %.2f\n", h);
-				valoresx(valoresFx, h, maximo, minimo, nroDivisoes, grau, coeficiente, valoresX);  //calcula x fx e it
+				valoresx(valoresFx, h, maximo, minimo, nroDivisoes, grau, coeficiente, valoresX); // calcula x fx e it
 				printf("\n\n");
 				system("pause");
 				printf("\nDeseja calcular novamente com outro numero de trapezios? 1(sim) ou 2(nao)");
 				scanf("%i", &op);
-			}while(op==1);
+			} while (op == 1);
 
-		
 			break;
 
 		// Método dos Mínimos Quadrados
-		case 2: system("cls");
+		case 2:
+			system("cls");
 			printf("---------------- Metodos Numericos Computacionais - Mínimos Quadrados ----------------");
 
 			printf("\n\nQuantos valores de x e y possui? ");
 			scanf("%i", &qtde);
 
 			printf("\nDigite valores de x:\n");
-			for(i=0; i<qtde; i++){
-					aloca(&xMMQ, i+1);
-					scanf("%f", (xMMQ+i));
-			}
-			
-			printf("\nDigite valores de y:\n");
-			for(i=0; i<qtde; i++){
-					aloca(&yMMQ, i+1);
-					scanf("%f", (yMMQ+i));
+			for (i = 0; i < qtde; i++)
+			{
+				aloca(&xMMQ, i + 1);
+				scanf("%f", (xMMQ + i));
 			}
 
-			do{
+			printf("\nDigite valores de y:\n");
+			for (i = 0; i < qtde; i++)
+			{
+				aloca(&yMMQ, i + 1);
+				scanf("%f", (yMMQ + i));
+			}
+
+			do
+			{
 				printf("\nDigite uma opcao: 1 - reta ou 2 - parabola: ");
 				scanf("%i", &operador);
 				fflush(stdin);
-			}while(operador!=1 && operador!=2);
+			} while (operador != 1 && operador != 2);
 
-		//vetores(yMMQ, xMMQ, u0, u1, u2, qtde, operador);
-	
+			if (operador == 1)
+			{
+				// codigo para reta
+				cria_sistemaLinear(sistemaLinear_l, xMMQ, yMMQ, qtde);
+				mmq(sistemaLinear_l);
+			}
+			else
+			{
+				// codigo para parabola
+				cria_sistemaLinear_q(sistemaLinear_q, xMMQ, yMMQ, qtde);
+				mmq_q(sistemaLinear_q);
+			}
 
-
-
+			// vetores(yMMQ, xMMQ, u0, u1, u2, qtde, operador);
+			printf("\n\n");
+			system("pause");
 			break;
 
 		} // switch
@@ -144,6 +170,156 @@ void aloca(float **p, int tam)
 	}
 } // aloca
 
+// MÉTODOS MÍNIMOS QUADRADOS
+void mmq(float *sistemaLinear)
+{
+	float m_, m, a1, a0;
+	int i;
+
+	m_ = *sistemaLinear;
+
+	m = *(sistemaLinear + 3) / m_;
+	for (i = 0; i < 3; i++)
+	{
+
+		*(sistemaLinear + (i + 3)) -= *(sistemaLinear + i) * m; // L2 = L2 - L1 * M
+	}
+
+	printf("\nEliminacao de Gauss\n");
+
+	printf("\nsistemaLinear equivalente:");
+	mostra_sistemaLinear(sistemaLinear, 1);
+
+	a1 = *(sistemaLinear + 5) / *(sistemaLinear + 4);
+	a0 = (*(sistemaLinear + 2) - *(sistemaLinear + 1) * a1) / *sistemaLinear;
+
+	// mostra funcao linear
+	printf("\n:");
+	printf("\na0=%.2f\na1=%.2f", a0, a1);
+}
+void mostra_sistemaLinear(float *sistemaLinear, int tipo)
+{
+	// tipo = 1 (linear); tipo = 2 (parabola)
+
+	int i;
+	if (tipo == 1)
+	{
+		for (i = 0; i < 6; i++)
+		{
+			if (i % 3 == 0)
+				printf("\n");
+			printf("\t%.2f", *(sistemaLinear + i));
+		}
+	}
+	else if (tipo == 2)
+	{
+		for (i = 0; i < 12; i++)
+		{
+			if (i % 4 == 0)
+				printf("\n");
+			printf("\t%.2f", *(sistemaLinear + i));
+		}
+	}
+	printf("\n");
+}
+void cria_sistemaLinear(float *sistemaLinear, float *x, float *y, int elementos)
+{
+	int i;
+
+	*sistemaLinear = elementos; // nº de elementos
+
+	for (i = 0; i < elementos; i++)
+	{
+		*(sistemaLinear + 1) += *(x + i);
+		*(sistemaLinear + 2) += *(y + i);
+		*(sistemaLinear + 4) += pow(*(x + i), 2);
+		*(sistemaLinear + 5) += (*(y + i)) * (*(x + i));
+	}
+
+	*(sistemaLinear + 3) = *(sistemaLinear + 1);
+
+	printf("\nSistema Escalar:");
+	mostra_sistemaLinear(sistemaLinear, 1);
+}
+
+/*FUNCAO PARABOLA*/
+void mmq_q(float *sistemaLinear)
+{
+	int i;
+	float aux, m_, m1, m2, a2, a1, a0;
+
+	printf("\nEliminacao de Gauss\n");
+
+	for (i = 0; i < 4; i++)
+	{
+		aux = *(sistemaLinear + i);
+		*(sistemaLinear + i) = *(sistemaLinear + (i + 4));
+		*(sistemaLinear + (i + 4)) = aux;
+	}
+
+	m_ = *sistemaLinear;
+	m1 = *(sistemaLinear + 4) / m_;
+	m2 = *(sistemaLinear + 1) / *(sistemaLinear + 5);
+
+	for (i = 0; i < 4; i++)
+	{
+		// linha 2:
+		*(sistemaLinear + (i + 4)) -= *(sistemaLinear + i) * m1;
+		// linha 3:
+		*(sistemaLinear + (i + 8)) -= *(sistemaLinear + i) * m2;
+	}
+
+	printf("\nsistemaLinear equivalente:");
+	mostra_sistemaLinear(sistemaLinear, 2);
+
+	m_ = *(sistemaLinear + 5);
+	m1 = *(sistemaLinear + 9) / m_;
+
+	for (i = 4; i < 8; i++)
+	{
+		// linha 3:
+		*(sistemaLinear + (i + 4)) -= *(sistemaLinear + i) * m1;
+	}
+
+	printf("\nsistemaLinear equivalente:");
+	mostra_sistemaLinear(sistemaLinear, 2);
+
+	a2 = *(sistemaLinear + 11) / *(sistemaLinear + 10);
+	a1 = (*(sistemaLinear + 7) - *(sistemaLinear + 6) * a2) / *(sistemaLinear + 5);
+	a0 = (*(sistemaLinear + 3) - *(sistemaLinear + 2) * a2 - *(sistemaLinear + 1) * a1) / *sistemaLinear;
+
+	// mostra funcao parabola
+	printf("\nResposta:");
+	printf("\na0=%.3f\na1=%.3f\na2=%.3f\n", a0, a1, a2);
+}
+
+void cria_sistemaLinear_q(float *sistemaLinear, float *x, float *y, int elementos)
+{
+	int i;
+
+	// nº de elementos
+	*sistemaLinear = elementos;
+
+	for (i = 0; i < elementos; i++)
+	{
+		*(sistemaLinear + 1) += *(x + i);
+		*(sistemaLinear + 2) += pow(*(x + i), 2);
+		*(sistemaLinear + 3) += (*(y + i));
+
+		*(sistemaLinear + 6) += (*(x + i)) * pow(*(x + i), 2);
+		*(sistemaLinear + 7) += (*(y + i)) * (*(x + i));
+		*(sistemaLinear + 10) += pow(*(x + i), 4);
+		*(sistemaLinear + 11) += (*(y + i)) * pow(*(x + i), 2);
+	}
+
+	*(sistemaLinear + 4) = *(sistemaLinear + 1);
+	*(sistemaLinear + 5) = *(sistemaLinear + 8) = *(sistemaLinear + 2);
+	*(sistemaLinear + 9) = *(sistemaLinear + 6);
+
+	printf("\nTabela 1:");
+	mostra_sistemaLinear(sistemaLinear, 2);
+}
+
 // Trapézios
 float calculaH(float minimo, float maximo, int nroDivisoes)
 {
@@ -152,20 +328,19 @@ float calculaH(float minimo, float maximo, int nroDivisoes)
 	return h;
 }
 
-
 void valoresx(float *fx, float h, float maximo, float minimo, int nroDivisoes, int grau, float *coef, float *x)
 {
 	int i, j;
 	int total = nroDivisoes; // tirar maximo
 	float valorF = 0;
-	
+
 	for (i = 0; i <= total; i++)
 	{
 		aloca(&fx, i + 1);
 		aloca(&x, i + 1);
 		valorF = 0;
-		if(i!=0 && i!=nroDivisoes)
-			*(x+i) = (minimo + (h * (i)));   //calcula x
+		if (i != 0 && i != nroDivisoes)
+			*(x + i) = (minimo + (h * (i))); // calcula x
 
 		for (j = 0; j <= grau; j++)
 		{
@@ -174,52 +349,54 @@ void valoresx(float *fx, float h, float maximo, float minimo, int nroDivisoes, i
 			else if (i == nroDivisoes)
 				valorF += (*(coef + j)) * (pow(maximo, j));
 			else
-				valorF += (*(coef + j)) * (pow((*(x+i)), j));
+				valorF += (*(coef + j)) * (pow((*(x + i)), j));
 		}
-		*(fx+i)=valorF;
-		
+		*(fx + i) = valorF;
 	}
 
-	//mostrar valores de X e Fx
-	for(i=0; i<=nroDivisoes; i++){
-		if(i==0)
+	// mostrar valores de X e Fx
+	for (i = 0; i <= nroDivisoes; i++)
+	{
+		if (i == 0)
 			printf("\nX[%i] = %.2f", i, minimo);
-		else if(i==nroDivisoes)
+		else if (i == nroDivisoes)
 			printf("\nX[%i] = %.2f", i, maximo);
 		else
-			printf("\nX[%i] = %.2f", i, *(x+i));
+			printf("\nX[%i] = %.2f", i, *(x + i));
 	}
 	printf("\n");
-	for(i=0; i<=nroDivisoes; i++)
-		printf("\nFx[%i] = %.2f", i, *(fx+i));
+	for (i = 0; i <= nroDivisoes; i++)
+		printf("\nFx[%i] = %.2f", i, *(fx + i));
 	printf("\n");
 
 	calculaIt(fx, h, nroDivisoes);
 
 } // valoresx
 
-void calculaIt(float *fx, float h, int nroDivisoes){
+void calculaIt(float *fx, float h, int nroDivisoes)
+{
 	int i;
-	float soma=0, calculo=0, maximo, minimo;
-	for(i=0; i<=nroDivisoes; i++){
-		if(i==0)
-			minimo=*(fx+i);
-		else if(i==nroDivisoes)
-			maximo=*(fx+i);
+	float soma = 0, calculo = 0, maximo, minimo;
+	for (i = 0; i <= nroDivisoes; i++)
+	{
+		if (i == 0)
+			minimo = *(fx + i);
+		else if (i == nroDivisoes)
+			maximo = *(fx + i);
 		else
-			soma+=*(fx+i);
+			soma += *(fx + i);
 	}
-	calculo=(h/2)*((minimo + maximo)+(2*soma));  //calculo da integral
+	calculo = (h / 2) * ((minimo + maximo) + (2 * soma)); // calculo da integral
 	printf("\n%ITR = %.4f\n", calculo);
 
-}///calculaIt
+} /// calculaIt
 
 /*
 void vetores(float *fx, float *x, float *u0, float *u1, float *u2, int qtde, int grau){
-	
+
 	int i, j;
-	if(grau<=2){  
-		for(i=0; i<=qtde; i++){  //qtde de x 
+	if(grau<=2){
+		for(i=0; i<=qtde; i++){  //qtde de x
 			aloca(&u0, i+1);
 				*(u0+j)=pow(*(x+i), 0);
 			aloca(&u1, i+1);
@@ -230,8 +407,8 @@ void vetores(float *fx, float *x, float *u0, float *u1, float *u2, int qtde, int
 			}
 		}
 	}
-	/*else if(grau==2){  
-		for(i=0; i<=qtde; i++){  //qtde de x 
+	/*else if(grau==2){
+		for(i=0; i<=qtde; i++){  //qtde de x
 			aloca(&u0, i+1);
 				*(u0+j)=pow(*(x+i), 0);
 			aloca(&u1, i+1);
@@ -240,7 +417,7 @@ void vetores(float *fx, float *x, float *u0, float *u1, float *u2, int qtde, int
 				*(u2+j)=pow(*(x+i), 2);
 		}
 
-	
+
 	//mostrar vetores
 	if(grau==1){
 		printf("\n  Y  \t  U0  \t  U1  \t");
@@ -254,8 +431,8 @@ void vetores(float *fx, float *x, float *u0, float *u1, float *u2, int qtde, int
 			printf("\n%.2f\t%.2f\t%.2f\t%.2f\t", *(fx+i), *(u0+i), *(u1+i), *(u2+i));
 		}
 	}
-	
-			
+
+
 }
 
   */
@@ -263,28 +440,28 @@ void vetores(float *fx, float *x, float *u0, float *u1, float *u2, int qtde, int
 /*
 float descobriU(float *x, float *y, float *mu,int qtde, int grau){
 	int l, c;
-	
+
 	for(l=0;l<=qtde;l++)
 	{
 		aloca(&mu, l+1);
-	    for(c=0;c<=grau;c++)
-	    {
+		for(c=0;c<=grau;c++)
+		{
 			*(mu+l*grau+c) = pow((x+l), grau);	// endereço de cada elemento
-	    }
+		}
 	}
 }
 
 float produtoEscalar(float *x, float *y, float *mu, float *m,int qtde, int grau){
 	int l, c;
-	
+
 	for(l=0;l<=qtde;l++)
 	{
 		aloca(&m, l+1);
-	    for(c=0;c<=qtde;c++)
-	    {
-			(*(m+l*coluna+c))*(*(m+l*coluna+c))			
-			
-	    }
+		for(c=0;c<=qtde;c++)
+		{
+			(*(m+l*coluna+c))*(*(m+l*coluna+c))
+
+		}
 	}
 }
 
